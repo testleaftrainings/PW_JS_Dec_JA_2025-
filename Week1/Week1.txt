@@ -1,0 +1,573 @@
+Q1: What is JavaScript, and why is it called the "language of the web"?
+
+JavaScript (JS) is a high-level language because it hides all low-level system details like memory allocation, CPU management, and hardware interaction.
+It lets developers write code in a human-friendly, easy-to-read way, while the engine handles all the complex internal operations automatically.
+
+It is interpreted lanuguage, where JavaScript code is executed line-by-line by the browser (Chrome, Firefox, Edge).
+You don’t need to compile it manually like Java or C++.
+
+JS is lightweighted because The language is small, fast, and efficient, with minimal syntax.
+
+JS is dynamic programming language, it allows changing data types at runtime.
+
+It’s called the "language of the web" because It is primarily used to make web pages interactive and dynamic.
+it runs in all browsers without additional installation, making it the core technology for client-side interactivity
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q2: what are the unique features of JS?
+
+1) Supports both client and server side validation
+
+JavaScript can validate data inside the browser (client-side) and also on the server-side, reducing server load and improving user experience.
+With Node.js, JavaScript can run on the backend, enabling full-stack validation using the same language.
+
+2) Event driven architecture:
+
+JavaScript is event-driven, meaning it reacts to events such as clicks, keypresses, API responses, timers, etc.
+Instead of running all code sequentially, it executes functions only when an event occurs, making applications more efficient and responsive.
+
+3) Asynchronous prgramming:
+
+JavaScript can handle long-running tasks (like API calls, file operations, or timers) without blocking the main thread.
+It uses callbacks, Promises, and async/await to run tasks in the background, allowing the rest of the code to execute smoothly and efficiently.
+Ex: Real time analogy(Restaurant scenario)
+
+4) Single threaded Non-Blocking I/O-(Node.js event loop)
+
+JavaScript runs on a single thread,the Node.js event loop, it can handle multiple tasks concurrently.
+Non-blocking I/O ensures that JavaScript continues executing other code while waiting for I/O operations (like API calls, database queries, or file reads), improving performance and responsiveness.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q3: What are the different data types we have in JavaScript?
+
+Primitive data types:
+---------------------
+
+Immutable, cannot be changed once created
+It is Stored directly in memory, immutable (e.g., let x = 5).
+
+1) String – Text values ("Hello")
+
+2) Number – Integers & decimals (10, 3.5)
+
+3) Boolean – True/false values
+
+4) Undefined – Variable declared but not assigned
+
+5) Null – Empty or intentional absence of value
+
+6) BigInt – BigInt is used to represent integers larger than Number.MAX_SAFE_INTEGER (2⁵³ − 1).
+It has no fixed maximum or minimum range and supports arbitrary precision, meaning it can store extremely large or small integers.
+The only limitation is the available system memory.
+
+In JavaScript, the Number type is stored as a 64-bit floating-point (IEEE-754).
+Because of this, it can safely represent integers only between −(2⁵³ − 1) and +(2⁵³ − 1).
+2⁵³ − 1 = 9,007,199,254,740,991 (≈ 9 quadrillion)
+Any integer beyond this limit may lose precision.
+
+7) Symbol – Unique identifiers
+Symbol is a primitive, unique, and immutable data type in JavaScript, often used as object property keys.
+Even if two symbols have the same description, they are always different and cannot be equal.
+
+Ex: const sym1 = Symbol("id");
+const sym2 = Symbol("id");
+
+console.log(sym1 === sym2); // false
+
+
+✅ JavaScript Data Types & Their Sizes
+
+🔹 Primitive Data Types
+
+Data Type	  Size	                             Notes
+Number	     64-bit (8 bytes)	                Uses IEEE-754 double precision
+String	     2 bytes per character	        UTF-16 encoding
+Boolean	     1 bit (but practically 1 byte)	true / false
+Undefined    No defined size	                Special primitive value
+Null	     No defined size	                Intentional empty value
+BigInt	     Varies (depends on number length)	Stores arbitrarily large integers
+Symbol	     Not fixed	                        Size cannot be measured directly
+
+
+Non-Primitive data types:
+-------------------------
+
+It is stored Stored as reference (not the actual value).
+Mutable → contents can be changed.(e.g., arrays, objects,functions)
+
+1) Object
+const person = {
+  name: "Gauthami",
+  age: 25
+};
+
+// Modify property
+person.age = 26;
+
+// Add new property
+person.city = "Chennai";
+
+
+2) Array
+const numbers = [10, 20, 30];
+
+// Modify element
+numbers[0] = 100;
+
+// Add element
+numbers.push(40);
+
+3️) Function
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+// Assign function to another variable (reference)
+const sayHi = greet;
+console.log(sayHi("Gauthami")); // Hello, Gauthami!
+
+Summary:
+--------
+Non-Primitive    Data Types (Reference)                               Quick Syntax
+Data Type	   Syntax Example	                                 Notes
+Object	         const obj = { name: "Gauthami", age: 25 };	         Mutable, stored by reference
+Array	         const arr = [10, 20, 30];	                         Mutable, stored by reference
+Function	  function greet(){...} or const greet = () => {...};    Can be assigned, passed, stored
+
+
+🔹 Non-Primitive (Reference) Data Types
+---------------------------------------
+
+Data Type	          Size	            Notes
+Object	                Dynamic	           Depends on number of keys & values
+Array	                Dynamic	           Depends on elements stored
+Function	        Dynamic	           Depends on code + closures
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q4.What is hoisting in JavaScript, and how does it affect Playwright test execution?
+
+Hoisting os default behaviour of JS by moving the declarations to the top their scope(Global/functional/Block) before the code is executed
+With Hoisting-JS execution has 2 phases
+
+1.Memory creation phase:
+Here the variables and functiones are allocated with memory.
+2.Execution phase:
+code will run line by line and values are assigned for performing operations.
+
+Types of hoisting
+1) variable hoisting
+2) function hoisting
+
+1. var
+
+var declarations are hoisted and initialized to undefined.
+So, you can access the variable before its declaration (but the value will be undefined until assignment).
+Ex:
+console.log(a); // ✅ undefined (hoisted + initialized)
+var a = 10;
+console.log(a); // 10
+
+2. let
+
+let is hoisted but not initialized.
+Exists in a Temporal Dead Zone (TDZ) from the start of the scope until the line of declaration.
+Accessing it before declaration throws a ReferenceError.
+Ex
+console.log(b); // ❌ ReferenceError (TDZ)
+let b = 20;
+console.log(b); // 20
+
+3. const
+
+Same as let → hoisted but not initialized, also in Temporal Dead Zone.
+The difference: must be initialized at the time of declaration.
+Ex:
+console.log(c); // ❌ ReferenceError (TDZ)
+const c = 30;
+console.log(c); // 30
+
+2) Function declarations are fully hoisted.
+
+This means both the function name and the function body are moved to the top of their scope.
+You can call the function before it is defined.
+
+Sample code: 
+Sayhello()
+function Sayhello(){
+    console.log("Welcome")
+    }
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q5: What is the difference between var, let, and const in terms of variable declaration?
+
+var: function-scoped, hoisted (initialized as undefined), allows re-declaration.
+let: block-scoped, hoisted but not initialized (temporal dead zone), can be reassigned but not re-declared.
+const: block-scoped, must be initialized at declaration, cannot be reassigned.
+
+var: redeclare ✅, reassign ✅
+let: redeclare ❌, reassign ✅
+const: redeclare ❌, reassign ❌
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q6. What is the difference between var, let, and const in terms of scoping?
+Function Scope vs Block Scope
+
+1. Function Scope (used by var)
+Variables declared with var are function-scoped.
+This means they are visible throughout the function, regardless of block {} boundaries.
+
+Example:
+
+function testFunctionScope() {
+  if (true) {
+    var x = 10;  // var is function-scoped
+  }
+  console.log(x); // ✅ Accessible here → 10
+}
+
+testFunctionScope();
+
+2. Block Scope (used by let and const)
+
+Variables declared with let and const are block-scoped.
+This means they are only accessible within the block {} where they are defined.
+
+Example:
+
+function testBlockScope() {
+  if (true) {
+    let y = 20;   // let is block-scoped
+    const z = 30; // const is also block-scoped
+  }
+  console.log(y); // ❌ Error: y is not defined
+  console.log(z); // ❌ Error: z is not defined
+}
+
+testBlockScope();
+
+var is function scoped and hoisted with undefined.
+let and const are block scoped but not initilized(In temporal dead zone-throws reference error-value cannot be accessed before initialization)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q7. What is the difference between == and === in JavScript ?
+
+1. Double Equals (==) – Loose Equality
+
+Compares only values, not types.
+If types differ, JavaScript does type coercion (tries to convert them before comparing).
+
+Ex:
+
+console.log(5 == "5");   // true  (string "5" → number 5)// converts string 5 into number and then compares).
+console.log(0 == false); // true  (false → 0)
+console.log(null == undefined); // true  (special case)
+
+2. Triple Equals (===) – Strict Equality
+
+Compares both value and type.
+No type coercion happens.
+
+Ex:
+
+console.log(5 === "5");   // false (number vs string)
+console.log(0 === false); // false (number vs boolean)
+console.log(null === undefined); // false (different types)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q8. What is the difference between logical AND (&&) and OR (||) in JavaScript?
+
+1. Logical AND (&&)
+
+Returns true only if both operands are true.
+If the first operand is falsy, it returns that value immediately (short-circuiting).
+If the first operand is truthy, it returns the second operand.
+
+Ex:
+console.log(true && true);   // true
+console.log(true && false);  // false
+console.log(0 && "Hello");   // 0  (stops at first falsy)
+console.log("Hi" && "Bye");  // "Bye" (both truthy → returns last one)
+
+2. Logical OR (||)
+
+Returns true if at least one operand is true.
+If the first operand is truthy, it returns that value immediately (short-circuiting).
+If the first operand is falsy, it returns the second operand.
+
+Ex:
+console.log(true || false);  // true
+console.log(false || false); // false
+console.log(0 || "Hello");   // "Hello" (first falsy → returns second)
+console.log("Hi" || "Bye");  // "Hi" (first truthy → returns immediately)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q9. what is the difference between increment and decrement operator? how does it differe with preincrement and postincrement?
+
+Increment and decrement operators are unary operators in JavaScript that are used to increase or decrease the value of a numeric variable by 1.
+
+
+Increment Operator (++)
+-----------------------
+
+Used to add 1 to the value of a variable.
+
+Example:
+
+let a = 5;
+a++;  // now a = 6
+
+
+There are two types:
+
+✔ Pre-Increment (++a)
+
+Value increases before being used.
+
+let a = 5;
+console.log(++a); // 6
+
+✔ Post-Increment (a++)
+
+Value increases after being used.
+
+let a = 5;
+console.log(a++); // 5 (but a becomes 6 after this line)
+
+
+Decrement Operator (--)
+-----------------------
+
+Used to subtract 1 from a variable.
+
+Example:
+
+let b = 10;
+b--;  // now b = 9
+
+
+There are two types:
+
+✔ Pre-Decrement (--b)
+
+Value decreases before being used.
+
+let b = 10;
+console.log(--b); // 9
+
+✔ Post-Decrement (b--)
+
+Value decreases after being used.
+
+let b = 10;
+console.log(b--); // 10 (but b becomes 9 afterward)
+
+
+Operator  Meaning	Effect
+++	Increment	Adds 1
+--	Decrement	Subtracts 1
+++a	Pre-increment	Change first, then use
+a++	Post-increment	Use first, then change
+--a	Pre-decrement	Change first, then use
+a--	Post-decrement	Use first, then change
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q10. what is the difference between switch and if_else?
+
+🔹 if...else
+
+Used when we want to check multiple conditions (ranges, comparisons, complex logic).
+Works with boolean expressions (>, <, ==, etc.).
+Flexible, but can get messy if there are many conditions.
+
+Example:
+
+let score = 85;
+
+if (score >= 90) {
+  console.log("Grade A");
+} else if (score >= 75) {
+  console.log("Grade B");
+} else {
+  console.log("Grade C");
+}
+
+🔹 switch
+
+Used when we want to compare a single value against multiple fixed options.
+Works best with discrete values (numbers, strings).
+Cleaner and more readable than a long if...else if chain.
+
+Example:
+let day = 3;
+
+switch(day) {
+  case 1: console.log("Monday"); break;
+  case 2: console.log("Tuesday"); break;
+  case 3: console.log("Wednesday"); break;
+  default: console.log("Invalid day");
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q11. What are looping statements and what are its types?
+
+Looping statements are used to run a block of code repeatedly until a condition becomes false or
+Instead of writing the same line of code many times, you write it once and loop it.
+
+for loop
+---------
+
+
+Used when you know how many times you want to run the loop.
+
+✔ Example
+for (let i = 1; i <= 5; i++) {
+  console.log("Number:", i);
+}
+
+✔ Output
+Number: 1
+Number: 2
+Number: 3
+Number: 4
+Number: 5
+
+
+while loop
+----------
+
+Used when you don’t know the number of iterations in advance — you loop until condition becomes false.
+
+✔ Example
+let count = 1;
+
+while (count <= 3) {
+  console.log("Count:", count);
+  count++;
+}
+
+
+do…while loop
+-------------
+
+Used when you want to run the code at least once, even if the condition is false.
+
+let num = 5;
+
+do {
+  console.log("Value:", num);
+  num++;
+} while (num < 5);
+
+Even though num < 5 is already false, the loop runs one time.
+
+
+
+for…of loop
+-----------
+
+Used to iterate values in arrays, lists, or strings.
+
+✔ Example
+const colors = ["red", "green", "blue"];
+
+for (const c of colors) {
+  console.log(c);
+}
+
+
+for…in loop
+-----------
+
+Used to iterate keys (properties) of an object.
+
+✔ Example
+const person = {
+  name: "Gauthami",
+  age: 35
+};
+
+for (const key in person) {
+  console.log(key, "=", person[key]);
+}
+
+✔ Output
+name = Gauthami
+age =35
+
+
+
+const person = {
+  name: "Gauthami",
+  age: 35
+};
+
+Loop Type	Use Case
+---------       --------
+
+for	        Known number of iterations
+while	        Continue until condition becomes false
+do…while	Run once → then check condition
+for…of	        Iterate values in array/string
+for…in	        Iterate keys in objects
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q12. What is the difference between conditional and looping statements?
+
+🔹 Conditional Statements
+
+Purpose: To make decisions in the code based on a condition 
+Execution: Execute a block of code only if a condition is true.
+Examples: if, if...else, switch.
+
+Example:
+
+let age = 18;
+if (age >= 18) {
+  console.log("Eligible to vote");
+} else {
+  console.log("Not eligible to vote");
+}
+
+🔹 Looping Statements
+
+Purpose: Used to repeat a block of code multiple times or until a condition is false
+Continue execution until a condition becomes false.
+Examples: for, while, do...while
+
+Example:
+
+for (let i = 1; i <= 5; i++) {
+  console.log("Number:", i);
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q13. What is the difference between String literal and string objects?
+
+String literal
+--------------
+
+let a = "hello";
+let b = "hello";
+
+console.log(a === b);  // true
+Both are primitive strings, so comparison checks value.
+
+
+✔ String Object
+-----------------
+
+let x = new String("hello");
+let y = new String("hello");
+
+console.log(x === y);  // false
+
+
+Even though the content is the same:
+x and y are different objects
+
+Comparison checks reference, not value
+So it's false.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+

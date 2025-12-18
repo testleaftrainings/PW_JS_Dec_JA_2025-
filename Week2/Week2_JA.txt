@@ -1,0 +1,285 @@
+
+Q1. What is the difference between replace() and replaceAll() in test Automation?
+
+replace() changes only the first match.
+replaceAll() changes every match in the string.
+In test automation, we use it when the same word/character appears many times (like commas in prices or placeholders in locators).
+
+// Number
+
+let price = "1,20,000";
+let cleanPrice = price.replaceAll(",", "");
+console.log(cleanPrice); // 120000
+
+//String
+
+let text = "Test Automation is Fun";
+let newText = text.replaceAll(" ", "-");
+console.log(newText);//Test-Automation-is-Fun
+
+//Alphanumeric
+
+let code = "ORD-123-123-123";
+let cleaned = code.replaceAll("-", "");
+console.log(cleaned); // ORD123123123
+
+//Alphanumeric with Special Symbols
+
+let product = "PR@#123$%45!";
+let cleaned = product.replaceAll(/[^a-zA-Z0-9]/g, "");
+console.log(cleaned); // PR12345
+
+
+let product = "PR@#123$%45!";
+
+// Extract only alphabets
+let letters = product.replace(/[^a-zA-Z]/g, "");
+
+// Extract only digits
+let numbers = product.replace(/[^0-9]/g, "");
+
+// Extract only special characters
+let specials = product.replace(/[a-zA-Z0-9]/g, "");
+
+console.log("Letters:", letters);     // PR
+console.log("Numbers:", numbers);     // 12345
+console.log("Specials:", specials);   // @#$%!
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q2. What is the difference between slice() and substring() in JS?
+
+
+🔹 slice() is a JavaScript string method used to extract a part of a string (or array) and return it as a new string without changing the original one.
+
+Syntax: slice(start, end)
+Extracts characters from start index to end index.
+End index is not included.
+Negative indexes are allowed (count from the end).
+If start > end, it returns an empty string.
+Works with strings and arrays.
+More powerful and flexible.
+
+Example
+let text = "Playwright";
+
+console.log(text.slice(0, 4));   // Play
+console.log(text.slice(-5));     // right
+console.log(text.slice(5, 2));   // ""
+
+
+🔹 substring() is a JavaScript string method used to extract characters from a string between two given indexes.
+
+Syntax: substring(start, end)
+Extracts characters between two indexes.
+End index is not included.
+Negative values are not allowed (treated as 0).
+If start > end, it automatically swaps the values.
+Works only with strings.
+Simpler and safer but less flexible.
+
+Example
+let text = "Playwright";
+
+console.log(text.substring(0, 4));  // Play
+console.log(text.substring(-5));    // Playwright
+console.log(text.substring(5, 2));  // ayw
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q3. What are the different types of functions in JavaScript?
+
+🔹 1. Function Declaration / Named Function
+
+Defined with the function keyword and has a name.
+Can be called before or after declaration (As part of hoisting).
+
+function greet() {
+  console.log("Hello, World!");
+}
+greet(); // Hello, World!
+
+
+🔹 2. Function Expression
+
+A function assigned to a variable.
+Not hoisted — can only be called after it’s defined.
+
+const greet = function() {
+  console.log("Hello from function expression");
+};
+greet();
+
+
+🔹 3. Arrow Function (ES6)
+
+A shorter syntax, commonly used in modern JS.
+
+const greet = () => {
+  console.log("Hello from arrow function");
+};
+greet();
+
+Ex: const add = (a, b) => a + b;
+console.log(add(5, 3)); // 8
+
+
+🔹 4. Anonymous Function
+
+A function without a name.
+Usually used as arguments to other functions (callbacks).
+
+setTimeout(function() {
+  console.log("This is an anonymous function");
+}, 1000);
+
+Note:
+-----
+A callback function is simply a function that is passed as an argument to another function and is executed later (after some operation is done).
+
+a) Simple Callback Function
+------------------------
+
+
+function downloadMovie(callback) {
+  console.log("Downloading movie");
+  setTimeout(() => {
+    console.log("Movie downloaded");
+    callback(); // <-- call the function we were given
+  }, 2000);
+}
+
+function playMovie() {
+  console.log("Playing movie");
+}
+
+downloadMovie(playMovie);
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q4. What is a Promise in JavaScript?
+
+A Promise is an object that represents the result of an asynchronous operation.
+It tells us whether the operation is completed, successful, or failed — now or in the future.
+
+Stages/(States) of a Promise
+
+A Promise has 3 stages:
+
+Stage	           Meaning
+-----              --------
+
+Pending	        Operation is still in progress
+Fulfilled	Operation completed successfully
+Rejected	Operation failed with an error
+
+Example
+
+const promise = new Promise((resolve, reject) => {
+  let success = true;
+
+  if (success) {
+    resolve("Data loaded successfully");
+  } else {
+    reject("Failed to load data");
+  }
+});
+  .then(result => console.log(result))   // Fulfilled
+  .catch(error => console.log(error))    // Rejected
+  .finally(() => console.log("Done"));   // Always runs
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q5. What protocol is used in playwright?
+Playwright uses the **Chrome DevTools Protocol (CDP)** and also supports its own **WebSocket-based protocol** to communicate with browsers like Chromium, Firefox, and WebKit.
+CDP is a low-level protocol used by tools (like Playwright, Puppeteer) to control, inspect, and debug Chromium-based browsers.
+It allows direct access to browser internals like **DOM**, **network**, **console**, etc.
+
+
+what is websocket protocol?
+WebSocket is a communication protocol that provides full-duplex (two-way) communication between a client (browser) and a server over a single TCP connection.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q6. what are the Browser Installation commands in PW.
+
+* Install Playwright:*
+  npm init playwright@latest
+
+* Install Playwright with browsers:*
+  npx playwright install
+  This installs Chromium, Firefox, and WebKit browsers.
+
+* To install Playwright package:
+  npm install -D @playwright/test  //D-Dependencies
+
+* To Execute Playwright code
+  npx playwright test filename.spec.ts
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q7. what are the different browsers supported by Playwright.
+
+"Playwright supports all major browser engines: Chromium (Chrome, Edge, Opera, Brave, etc.), WebKit (Safari), and Firefox. This ensures true cross-browser testing with a single API.”
+ Playwright is cross-browser and supports all modern rendering engines.
+
+🔹 1. Chromium-based Browsers
+
+ Google Chrome
+ Microsoft Edge
+
+Any Chromium-based browser (Brave, Vivaldi, Opera, etc.)
+
+🔹 2. WebKit
+
+Safari (Playwright runs Safari’s engine through WebKit)
+
+🔹 3. Firefox
+
+Supports Mozilla Firefox
+It allows **cross-browser testing** with a single codebase.
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Q8. explain about chromium browser.
+
+Chromium is an open-source browser project by Google, which is the base for Chrome, Edge, Opera, Brave, and others. It uses the Blink engine and V8 JavaScript engine, making it fast and reliable.
+Playwright uses Chromium for automation because it’s lightweight, open, and widely compatible.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q9.  What is test function in playwright 
+
+The test() function in Playwright is used to define a test case and execute it using Playwright’s built-in test runner with automatic fixtures and lifecycle management.
+
+test('verify login', async ({ page }) => {
+  await page.goto('https://example.com');
+});
+
+Used with fixtures like `page`, `browser`, etc.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Q10. Explain about async/await?
+
+`async/await` is a coupled keywords to handle Promises in JavaScript.
+Makes asynchronous code look and behave like synchronous code.
+
+* `async` keyword defines a function that returns a Promise.
+* `await` pauses execution until the Promise is resolved or rejected.
+
+
+async function getData() {
+  const response = await fetch(url);
+  console.log(response);
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q11. How does Playwright handle auto-waiting and retries?
+
+Playwright auto-waits for elements to become visible, enabled, and attached to the DOM.
+It also retries failed steps (like click or fill) until timeout is hit, reducing flakiness.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q12. What is the role of Browser, Context, and Page in Playwright?
+ 
+
+Browser: Actual browser engine (Chromium, Firefox, WebKit)
+
+Context: Isolated environment like an incognito session
+
+Page: A single tab within a context
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+

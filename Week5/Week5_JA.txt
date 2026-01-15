@@ -1,0 +1,456 @@
+Q1. What is data parameterization in Playwright, and what are the different ways to implement it?
+
+Data parameterization is the process of running the same test with different sets of data instead of hard-coding values inside the test.
+
+Features:
+---------
+
+Avoid hard-coded test data
+→ Test data is externalized, making tests flexible and reusable.
+
+Test multiple scenarios using a single test
+→ Same test logic can be executed with different data sets.
+
+Improve test coverage
+→ More inputs can be validated without writing new test cases.
+
+Reduce duplicate test cases
+→ One parameterized test replaces many similar tests.
+
+Improve maintainability
+→ Changes in data do not require code changes in test logic.
+
+
+ways of implementation
+----------------------
+
+1)JSON :Reading and processing JSON files for dynamic test data.
+2)CSV :Handling .csv files for bulk data-driven tests.
+3)ENV :Utilizing .env files for environment-specific data.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q2. How do you read data from a JSON file in Playwright?
+
+1) Reading Data from (.env, .json, .csv Files)
+
+### **Definition**
+JSON --> JavaScript Object Notation.
+
+Feeding test data from external JSON files instead of hardcoding values.
+Useful for **data-driven testing**.
+
+Usage
+1. Sample JSON (testData.json):
+[
+  {
+    "TcaseId": "TC001",
+    "Username": "demoSalesManager",
+    "Password": "crmsfa"
+  },
+  { 
+    "TcaseId": "TC002",
+    "Username": "demoCSR",
+    "Password": "crmsfa"
+  } 
+]
+
+Step 1:
+Create a .json file under Data folder
+Step 2:
+Create a .spec.ts and import data from json file similar to the sample script.
+Step 3:
+Use the imported data in your test cases for validation.    
+Step 4:
+Run the test to see data-driven testing in action. 
+
+
+sample code:
+------------
+import {test} from "@playwright/test"
+import credentials from "../constants/login.json";
+
+test.describe.serial(`login tests in serial mode`,async()=>{  //used to read the data serially one by one
+
+    for(let data of credentials){     //used to read the data parallely and it is parallel by default
+        test(`Read data from Json ${data.TestcaseID}`,async ({page}) => {   //template literal is used with unique ID and it is dynamic orelse it will throw duplicate error as both TC will have same title
+            await page.goto("http://leaftaps.com/opentaps/control/main")
+            await page.locator("#username").fill(data.Username)
+            await page.locator("#password").fill(data.Password)
+            await page.locator(".decorativeSubmit").click()
+            
+        })
+        } 
+   })
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q3. How do you read data from a CSV file in Playwright?
+
+### **Definition**
+CSV --> Comma Seperated Values.
+
+Reading test data from CSV files and running tests with multiple data sets.
+CSV is widely used in organizations for bulk test data (rows = test cases, columns = input fields).
+
+Usage
+1. Sample CSV (testData.csv):
+
+tcid,username,password
+1,demoSalesManager,crmsfa
+2,demoCSR,crmsfa
+
+Step 1:
+Install csv : command - npm install csv-parse.
+
+Step 2:
+Create a .csv file under Data folder.
+
+Step 3:
+Create a .spec.ts and import data from csv file similar to the sample script.
+
+Step 3:
+Use the imported data in your test cases for validation.  
+
+Step 4:
+Run the test to see data-driven testing in action.
+
+sample code:
+------------
+
+import test from '@playwright/test'
+import { parse } from 'csv-parse/sync'
+import fs from 'fs'
+import path from 'path'
+
+//CSV-comma separated value, light weight
+//instal csv- npm install csv-parse// 
+//fs-file system/file stream, need to be imported form fs-file to get all the values from CSV
+
+//method (Absolute Path)
+ constants\loginCredentials.csv
+ const loginData:any[]=parse(fs.readFileSync(path.join(__dirname,"../constants/loginCredentials.csv")),{
+     columns:true,
+     skip_records_with_empty_values:true
+ })
+
+//method 2(Relative Path)
+const loginData: any=parse(fs.readFileSync("constants/loginCredentials.csv"),{columns: true,skip_empty_lines: true})
+
+
+//reading individual TC based on the index
+ test(`Learn to read the CSV11 value`,async() => {
+   
+    console.log(loginData[1].TestCaseId);
+    console.log(loginData[1].Username);
+    console.log(loginData[1].Password);
+    
+})
+ 
+
+//To read datas from CSV file 
+test.describe.serial(`read data serially`,async()=> {
+    
+
+for (let data of loginData){
+test(`Read data from CSV ${data.TestCaseId}`,async ({page}) => {
+        await page.goto("http://leaftaps.com/opentaps/control/main")
+        await page.locator("#username").fill(data.Username)
+        await page.locator("#password").fill(data.Password)
+        await page.locator(".decorativeSubmit").click()
+    })
+}
+})
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q4. How do you read data from a ENV file in Playwright?
+
+
+# Data Parameterization with ENV
+---
+### **Definition**
+
+A .env file (short for environment file) is a simple text file used to store environment variables in the form of key-value pairs.
+
+It is commonly used in projects to separate configuration data (like URLs, API keys, database credentials, secrets) from the actual application code.
+
+Usage
+1. Sample ENV (config.env): 
+APP_URL=https://example.com
+USERNAME=demoUser
+PASSWORD=securePass123
+
+
+Step 1:
+Install dotenv : command - npm install dotenv.
+Step 2:
+Create a .env file under Data folder.
+Step 3:
+Create a .spec.ts and import data from env file similar to the sample script. 
+Step 4:
+Use the imported data in your test cases for validation.
+Step 5:
+Run the test to see data-driven testing in action.
+
+sample code:
+------------
+
+import {test} from "@playwright/test"
+import dotenv from "dotenv"
+//process.env.variable
+//process-> environment variable
+//let filename=process.env.envFile||'qa'
+
+dotenv.config({path:'../utils/Qa.env'})
+test('login with env',async({page})=>{
+    let username=process.env.LF_Username as string
+    let password=process.env.LF_Password as string
+
+    await page.goto("http://leaftaps.com/opentaps/control/main")
+        await page.fill("#username",username)
+        await page.fill("#password",password)
+        await page.locator(".decorativeSubmit").click()
+
+})
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q5. What are Test Runner annotations of Playwright and When should you use?
+
+Test annotations are special labels used to control how tests or test suites run and commonly used for debugging, selective execution, and reporting.
+They help to mark, skip, focus, or tag specific tests.
+They make test execution more flexible, organized, and meaningful.
+
+
+🔹 1. test.only() — Run only one test
+
+Runs only that specific test while skipping all others.
+Useful when debugging a single test.
+Example:
+
+test.only('Login test', async ({ page }) => {
+  await page.goto('https://example.com');
+});
+
+🔹 2. test.skip() — Skip a test
+
+Skips a test (it will not run).
+Useful when a test is under development or not applicable.
+You can also conditionally skip tests.
+Example:
+
+test.skip('This test is under development', async ({ page }) => {});
+
+test('Run on Chrome only', async ({ browserName }) => {
+  test.skip(browserName !== 'chromium', 'Skip for non-chromium browsers');
+});
+
+🔹 3. test.fixme() — Mark as known issue
+
+Marks a test as a known issue that needs fixing later.
+Used to remember broken tests that shouldn’t be deleted.
+Example:
+
+test.fixme('Feature not working yet', async ({ page }) => {});
+
+🔹 4. test.fail() — Expected to fail
+
+Marks a test that is expected to fail (due to a known bug or negative scenario).
+If the test fails → that’s okay.
+If it passes → Playwright marks it as unexpected.
+Example:
+
+test.fail('This test is expected to fail due to bug #123');
+
+🔹 5. test.slow() — Mark as slow
+
+Used for long-running or performance tests.
+Increases the default timeout for that test.
+Example:
+
+test.slow('Performance test', async ({ page }) => {
+  await page.goto('https://example.com');
+});
+
+🔹 6. test.describe.only() / test.describe.skip() — Group control
+
+Used to control an entire group (suite) of tests.
+describe.only → runs only that suite.
+describe.skip → skips the entire suite.
+Example:
+
+test.describe.skip('Admin Features', () => {
+  test('Admin login', async ({ page }) => {});
+});
+
+🔹 7. test.step() — Add sub-steps
+
+Helps create clear step-by-step actions inside a test.
+Steps appear clearly in the Playwright Trace Viewer.
+Example:
+
+test('Login flow', async ({ page }) => {
+  await test.step('Open login page', async () => {
+    await page.goto('https://example.com/login');
+  });
+
+  await test.step('Enter credentials', async () => {
+    await page.fill('#username', 'Gauthami');
+    await page.fill('#password', 'Test@123');
+  });
+});
+
+🔹 8. test.info() — Access test metadata
+
+Used to get information about the current test like title, file, and status.
+Useful for logging and reports.
+Example:
+
+test('Get test info', async ({}, testInfo) => {
+  console.log('Running test:', testInfo.title);
+  console.log('File:', testInfo.file);
+});
+
+🔹 9. test.describe.config()
+
+Playwright supports three test execution behaviors:
+
+Default mode:
+-------------
+Tests run one after another,Even if one test fails, the next test still runs.
+
+test.describe('Default mode', () => {
+  test('Test 1', async () => {});
+  test('Test 2', async () => {});
+});
+
+Test 1 → Test 2(This is the default behavior in Playwright)
+
+Parallel mode:
+--------------
+Tests run at the same time, used when tests don’t depend on each other and should be independent.
+
+test.describe.parallel('Parallel mode', () => {
+  test('Test A', async () => {});
+  test('Test B', async () => {});
+});
+
+Serial mode:
+------------
+Tests run one by one, If one test fails, the next tests will NOT run.
+
+test.describe('Serial mode', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  test('Login', async () => {});
+  test('Dashboard', async () => {});
+});
+
+If Login fails → Dashboard is skipped, Used when tests depend on previous steps
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q6. How do you apply hooks like beforeEach inside describe blocks?
+
+
+Hooks in Playwright help define preconditions and postconditions for tests, ensuring consistency and reducing code repetition.”
+
+Hooks are special setup and teardown functions in Playwright.
+They run automatically before or after your tests.
+Hooks help to prepare data, open browsers, navigate, or clean up after tests.
+In simple words → Hooks = Do something before or after tests automatically.
+
+🔹 Types of Hooks in Playwright
+
+👉 test.beforeAll()
+ Runs once before all tests in the file.
+ Used to set up environment, launch browser, or create test data.
+
+👉 test.afterAll()
+ Runs once after all tests in the file.
+ Used to clean up resources, close database, or logout.
+
+👉 test.beforeEach()
+ Runs before each individual test.
+ Used to navigate to a page, perform login, or reset state.
+
+👉 test.afterEach()
+ Runs after each individual test.
+ Used to clear cookies, close pop-ups, or take screenshots on failure.
+
+🔹 Simple code
+--------------
+
+import { test, expect } from '@playwright/test';
+
+test.beforeAll(async () => {
+  console.log('Runs once before all tests');
+});
+
+test.afterAll(async () => {
+  console.log('Runs once after all tests');
+});
+
+test.beforeEach(async ({ page }) => {
+  console.log('Runs before each test');
+  await page.goto('https://example.com');
+});
+
+test.afterEach(async () => {
+  console.log('Runs after each test');
+});
+
+test('Test 1 - Verify Title', async ({ page }) => {
+  await expect(page).toHaveTitle(/Example/);
+});
+
+test('Test 2 - Verify URL', async ({ page }) => {
+  await expect(page).toHaveURL('https://example.com/');
+});
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q7: What is Codegen in Playwright, and how is it used?
+
+Codegen in Playwright is a tool that automatically generates code while you perform actions in the browser.
+It records your interactions and converts them into Playwright scripts in JavaScript, TypeScript, Python, or Java.
+
+Uses:
+-----
+
+Helps beginners learn selectors and commands quickly.
+Speeds up test script creation.
+Supports different languages.
+Can generate replayable test scripts.
+
+command:
+--------
+npx playwright codege
+
+
+Disadvantages of Codegen in Playwright
+---------------------------------------
+
+Generated code may be verbose
+Often includes extra unnecessary steps that you need to clean up.
+
+Limited flexibility
+Hard to handle complex logic, loops, or conditional flows automatically.
+
+Not always reliable for dynamic pages
+Selectors may break if the page structure changes.
+
+Requires editing for real projects
+You almost always need to refactor the code for maintainability and readability.
+
+Over-reliance can reduce learning
+Beginners may rely too much on Codegen and not learn Playwright commands properly.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+

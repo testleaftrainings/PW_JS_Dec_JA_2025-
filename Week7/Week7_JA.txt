@@ -1,0 +1,635 @@
+Q1. What is the difference between a class and an object in TypeScript?
+
+- Class → Blueprint/template that defines properties and methods.
+- Object → Instance of a class containing actual data.
+
+In Playwright, classes often represent pages in POM. Objects are created for page instances in tests.
+
+Example:
+export class BrowserSetup {
+  private browserName: string;
+  constructor(name: string) {
+    this.browserName = name;
+  }
+  async launchBrowser() {
+    console.log(`Launching browser: ${this.browserName}`);
+  }
+}
+const chrome = new BrowserSetup('Chrome');
+chrome.launchBrowser();
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q2. What are Access Modifiers in TypeScript?
+
+- public → Accessible from anywhere.
+- private → Accessible only within the class. Use getter/setter to read/modify.
+- protected → Accessible within class and subclasses.
+
+
+⭐ Access Modifiers in TypeScript
+
+TypeScript provides three access modifiers to control the visibility of class members (variables/methods).
+
+1️. public (default)
+
+Accessible everywhere
+From inside the class
+Outside the class
+From child classes
+
+If no modifier is written, it is public by default.
+
+Example:
+--------
+
+class LoginPage {
+  public username = '#username';
+
+  public enterUsername() {
+    console.log("Typing username");
+  }
+}
+
+2️. private
+
+Accessible only within the same class
+Not accessible outside the class
+Not inherited by child classes
+
+Used for:
+Sensitive locators
+Internal helper methods
+Preventing UI classes from direct manipulation
+
+Example:
+--------
+
+class LoginPage {
+  private password = '#password';
+
+  private logAction() {
+    console.log("Action logged");
+  }
+}
+
+
+Attempting to access privately:
+
+const pageObj = new LoginPage();
+pageObj.password;  // ❌ Error
+
+3️. protected
+
+Accessible within the same class
+Also accessible in child classes (inherited)
+Not accessible outside class hierarchy
+Useful for base classes in Playwright.
+
+Example:
+--------
+
+class BasePage {
+  protected baseUrl = 'https://example.com';
+
+  protected navigate(page) {
+    return page.goto(this.baseUrl);
+  }
+}
+
+class LoginPage extends BasePage {
+  goToLogin(page) {
+    return this.navigate(page); // ✔ allowed
+  }
+}
+
+
+But:
+
+const obj = new BasePage();
+obj.baseUrl; // ❌ Error: cannot access protected outside class
+
+Summary
+-------
+
+Modifier	Inside Class	Subclass	Outside Class
+public	✔	✔	✔
+private	✔	❌	❌
+protected	✔	✔	❌
+
+public: “Accessible from anywhere.”
+private: “Accessible only inside the class.”
+protected: “Accessible in the class and its subclasses.”
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q3. What is Inheritance in TypeScript?
+
+Inheritance lets a class inherit properties/methods from another class using `extends`.
+Promotes code reuse and reduces duplication
+
+
+Types of Inheritance Allowed in TypeScript:
+
+TypeScript supports only single inheritance directly, but using classes, interfaces, and composition you can achieve multiple forms of inheritance.
+
+1️.Single Inheritance (Supported)
+
+One class inherits from one parent class using extends.
+class Parent {}
+class Child extends Parent {}
+Directly supported in TypeScript.
+
+2️. Multilevel Inheritance (Supported)
+
+A → B → C chain.
+
+class A {}
+class B extends A {}
+class C extends B {}
+Supported because each class extends only one parent.
+
+3️. Hierarchical Inheritance (Supported)
+
+One parent, many children.
+
+class Parent {}
+class Child1 extends Parent {}
+class Child2 extends Parent {}
+Supported.
+
+4️. Multiple Inheritance (NOT supported for classes)
+
+You cannot extend more than one class.
+Not allowed:
+class Child extends Parent1, Parent2 {} // Error
+But, In TypeScript can achieve multiple inheritance through interfaces.
+
+interface A { a(): void; }
+interface B { b(): void; }
+
+class C implements A, B {
+  a() {}
+  b() {}
+}
+
+Allowed via interfaces, not classes.
+
+5️. Hybrid Inheritance (Partially supported)
+
+Combination of two or more types (e.g., hierarchical + multiple).
+TypeScript supports hybrid via interfaces, but not using multiple parent classes.
+
+Summary:
+-------
+
+1. TypeScript supports:
+
+Single inheritance
+Multilevel inheritance
+Hierarchical inheritance
+Multiple inheritance via interfaces (not via classes)
+Hybrid inheritance via interfaces
+
+2. TypeScript does NOT support:
+
+Multiple inheritance using classes
+TypeScript supports single, multilevel, and hierarchical inheritance through classes, and it supports multiple and hybrid inheritance through interfaces, but not through classes.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q4. How is `this` used in classes?
+
+Refers to current instance of the class.
+Used to access properties/methods of that instance.
+
+Example:
+export class LoginPage {
+  constructor(private page: Page) {}
+  async login(username: string, password: string) {
+    await this.page.fill('#username', username);
+    await this.page.fill('#password', password);
+    await this.page.click('#loginButton');
+  }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q5.What is Polymorphism?
+
+Ability to take multiple forms. Two types in TS:
+- Method Overloading
+- Method Overriding
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q6. What is Method Overloading?
+Same method name with different parameter signatures.
+
+Example:
+class ClickHelper {
+  click(locator: string): void;
+  click(locator: string, forceClick: boolean): void;
+  click(locator: string, forceClick?: boolean): void {
+    if (forceClick) console.log(`Force clicking ${locator}`);
+    else console.log(`Clicking ${locator}`);
+  }
+}
+const helper = new ClickHelper();
+helper.click('button#submit');       // Normal click
+helper.click('button#submit', true); // Force click
+--------------------------------------
+
+
+Method Overloading means having multiple methods with the same name but different parameters (type, number, or order).
+It allows the same method name to perform different actions based on the input.
+
+⭐ TypeScript Note (Very Important)
+
+TypeScript supports method overloading only at the type level (signatures), not true runtime overloading like Java.
+
+Meaning:
+
+You can declare multiple method signatures
+
+But only one actual implementation is allowed
+
+⭐ Example (TypeScript Method Overloading)
+class Calculator {
+  add(a: number, b: number): number;
+  add(a: string, b: string): string;
+
+  // single implementation
+  add(a: any, b: any): any {
+    return a + b;
+  }
+}
+
+const c = new Calculator();
+console.log(c.add(5, 10));       // 15
+console.log(c.add("Hi ", "All")); // "Hi All"
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q7. What is Method Overriding?
+
+Subclass redefines parent class method with same signature.
+
+Example:
+class BaseLogin {
+  async login() { console.log('Base login method'); }
+}
+class AdminLogin extends BaseLogin {
+  async login() { console.log('Admin login method'); }
+}
+const admin = new AdminLogin();
+admin.login(); // Output: Admin login method
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q8.What is Method Overriding?
+
+Method Overriding is when a child class provides its own implementation for a method that already exists in the parent class.
+The method name, parameters, and return type remain the same, but the behavior changes.
+
+⭐ Purpose of Method Overriding
+
+To change or extend parent class behavior
+To achieve runtime polymorphism
+To give specific implementation in child classes
+
+⭐ TypeScript Example (Method Overriding)
+class Animal {
+  speak() {
+    console.log("Animal makes a sound");
+  }
+}
+
+class Dog extends Animal {
+  speak() {                 // overriding
+    console.log("Dog barks");
+  }
+}
+
+const obj = new Dog();
+obj.speak();  // Output: Dog barks
+
+Same method name
+Same signature
+Different implementation
+Happens at runtime
+
+“Method overriding means redefining a parent class method in a child class to change or customize its behavior.”
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q9. What is Abstraction in TypeScript?
+
+Hiding complex implementation and showing only essentials.
+Achieved via:
+- Abstract Classes
+- Interfaces
+
+
+⭐ What is Abstraction in TypeScript?
+
+Abstraction in TypeScript means hiding the internal implementation details and exposing only the required functionalities to the user.
+It helps focus on what a method does rather than how it does it.
+
+⭐ How is Abstraction Achieved in TypeScript?
+
+TypeScript provides two ways:
+
+1️. Using Abstract Classes
+
+Can have abstract methods (no body)
+Can have normal methods
+Cannot be instantiated directly
+Must be inherited by a child class
+
+2️. Using Interfaces
+
+Defines what methods/properties must exist
+No implementation inside the interface
+Child class gives actual implementation
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q10. What is the difference between Abstract Class vs Interface
+
+- Abstract class → can have both abstract (no implementation) and concrete methods.
+- Interface → only method signatures, no implementation.
+
+
+⭐ Abstract Class vs Interface — Interview Answer
+
+1️. Purpose
+----------
+
+Abstract Class:
+Used to provide partial implementation + common/shared logic.
+
+Interface:
+Used to define a contract/structure — what methods/properties should exist.
+
+2️. Implementation
+-----------------
+
+Abstract Class:
+
+
+Can have abstract methods (no body)
+Can have concrete methods (with body)
+
+Interface:
+
+Only declarations
+No implementation allowed
+
+3️. Inheritance
+---------------
+
+Abstract Class:
+
+Supports single inheritance only
+A class can extend only one abstract class
+
+Interface:
+
+Supports multiple inheritance
+A class can implement multiple interfaces
+
+4️. Object Creation
+-------------------
+
+Abstract Class:
+❌ Cannot be instantiated directly
+✔ Can have constructor logic
+
+Interface:
+❌ Cannot be instantiated
+❌ Cannot have constructors
+
+5️. Access Modifiers
+--------------------
+
+Abstract Class:
+✔ Can use public, private, protected
+
+Interface:
+❌ No access modifiers
+(Everything is automatically public)
+
+6️.Use Case
+-----------
+
+Abstract Class:
+When you want to:
+✔ Share common behavior
+✔ Provide base functionality
+✔ Force certain methods to be overridden
+
+Interface:
+When you want to:
+✔ Define structure
+✔ Enforce consistency
+✔ Support multiple behavior types
+
+Summary :
+---------
+
+Feature	Abstract           Class	               Interface
+
+Implementation	            ✔ Yes	               ❌ No
+Abstract Methods	    ✔ Yes	               ✔ Yes
+Concrete Methods	    ✔ Yes	               ❌ No
+Constructor	            ✔ Yes	               ❌ No
+Multiple Inheritance	    ❌ No	               ✔ Yes
+Access Modifiers	    ✔ Allowed	               ❌ Not allowed
+Instantiation	            ❌ No	               ❌ No
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q11. How is `super` used in classes?
+
+Used to call parent class constructor/methods from child class.
+
+Example:
+export abstract class BasePage {
+  protected page: Page;
+  constructor(page: Page) { this.page = page; }
+  async navigateTo(url: string) { await this.page.goto(url); }
+}
+
+class LoginPage extends BasePage {
+  constructor(page: Page) { super(page); }
+  async login(username: string, password: string) {
+    await this.page.fill('#username', username);
+    await this.page.fill('#password', password);
+    await this.page.click('#loginButton');
+  }
+}
+
+
+super is a keyword used inside a child class (subclass) to:
+
+1. Call the parent class constructor
+
+When a class extends another class, the child must call super() before using this.
+
+2. Access parent class methods
+
+You can use super.methodName() to call the parent class’s version of a method (especially useful when overriding).
+
+
+
+Example: 
+
+Using super to Call Parent Methods
+class Vehicle {
+  start() {
+    console.log("Vehicle started");
+  }
+}
+
+class Car extends Vehicle {
+  start() {
+    super.start(); // calling parent method
+    console.log("Car started");
+  }
+}
+
+const c = new Car();
+c.start();
+
+✔ Output:
+Vehicle started
+Car started
+
+Summary
+-------
+
+super() → calls the parent class constructor.
+
+super.method() → calls a method from the parent class.
+
+Must be called before this in a subclass constructor.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q12️. What parts of a  framework should always be abstracted and why?
+
+A robust framework should always abstract:
+
+1. Locator interactions
+To avoid repeating page.locator(), page.click(), etc
+
+2. Common actions
+Navigation, login, wait conditions, file uploads, API calls.
+
+3. Environment configuration
+Base URLs, credentials, API endpoints — abstract them into config files.
+
+4. Assertions
+Often wrapped in helper classes for readability and consistency.
+
+Reason:
+Abstraction increases maintainability, promotes reusability, improves readability, and isolates changes when application UI evolves.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q13. What are fixtures in Playwright and why are custom fixtures important?
+
+Fixtures in Playwright are reusable test setup utilities that manage the creation and teardown of objects such as browsers, contexts, pages, or custom components.
+
+Why custom fixtures 
+--------------------
+
+Provide consistent setup for each test
+Reduce code duplication
+Improve readability by hiding setup complexity
+
+Example uses:
+-------------
+
+loggedInPage fixture
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q14. What is the Page Object Model and why is it beneficial in UI automation?
+
+POM is a design pattern that separates UI locators and interactions into dedicated page classes, instead of embedding them in tests.
+
+Benefits:
+---------
+
+Reduces code duplication
+Makes tests readable and maintainable
+Centralizes all UI changes
+Encourages reusable and modular test architecture
+Hides complexity from test files
+Supports abstraction & clean layering
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q1️5. What best practices do you follow to keep page objects maintainable?
+
+Keep locators private:
+Prevents leaking UI details into tests.
+
+Use meaningful method names:
+E.g., performLogin() instead of clickLoginButton().
+
+Avoid assertions inside page objects:
+Assertions belong in tests, not in page classes.
+
+Keep page objects focused:
+One page → one class → one responsibility.
+
+Reuse BasePage for common actions:
+Improves consistency and reduces code duplication.
+
+Avoid large page classes:
+Break down big pages into smaller components if needed.
+
+Use interfaces for contract consistency:
+Ensures every page follows the same structure.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Q16. How do you structure page classes in your Playwright + TS framework?
+
+A well-structured Playwright POM includes:
+
+src/
+  pages/
+    base.page.ts
+    login.page.ts
+    dashboard.page.ts
+    cart.page.ts
+
+  fixtures/
+    login.fixture.ts
+
+  utils/
+    apiClient.ts
+    config.ts
+
+  tests/
+    login.spec.ts
+    cart.spec.ts
+
+
+Each page class contains:
+Locators
+Page-specific actions
+Navigation logic
+Reusable methods
+
+Example:
+
+export class LoginPage extends BasePage {
+  readonly usernameInput = this.page.locator('#username');
+  readonly passwordInput = this.page.locator('#password');
+  readonly loginBtn = this.page.locator('#login');
+
+  async login(username: string, password: string) { ... }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
